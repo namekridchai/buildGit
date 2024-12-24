@@ -21,6 +21,8 @@ func main() {
 	switch command {
 	case "init":
 		git.Init()
+	case "hash":
+		git.Hash(os.Args[2])
 	default:
 		fmt.Println("Unknown command:", command)
 		os.Exit(1)

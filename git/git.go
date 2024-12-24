@@ -1,6 +1,8 @@
 package git
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"os"
@@ -24,6 +26,34 @@ func Init() {
 		}
 	}
 
+}
+
+func Hash(filePath string) {
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		panic(err)
+	}
+	hash := sha256.New()
+	hash.Write([]byte(content))
+	hashBytes := hash.Sum(nil)
+	hashString := hex.EncodeToString(hashBytes)
+	_, err = os.Stat(dir+"/object")
+	if err != nil {
+		if os.IsNotExist(err) {
+			err := os.Mkdir(dir+"/object",0755)
+			if err!=nil{
+				panic(err)
+			}
+		} else {
+			panic(err)
+		}
+	}
+	
+	file, err := os.Create(dir+"/object/"+hashString)
+	if err != nil {
+		panic(err)
+	}
+	file.Close()
 }
 
 func IsDirExist(dirName string) (bool, error) {
