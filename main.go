@@ -23,6 +23,8 @@ func main() {
 		command_pkg.Init()
 	case "hash":
 		command_pkg.Hash(os.Args[2])
+	case "cat":
+		
 	default:
 		fmt.Println("Unknown command:", command)
 		os.Exit(1)

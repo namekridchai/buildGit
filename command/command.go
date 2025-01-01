@@ -63,3 +63,7 @@ func Hash(filePath string) {
 
 	file.Close()
 }
+
+func Cat(hash string){
+	
+}

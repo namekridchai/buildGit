@@ -3,18 +3,17 @@ package util
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 )
 
 func IsDirExist(dirName string) (bool, error) {
-	info, err := os.Stat(dirName)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return false, nil
-		} else {
-			fmt.Println("there is err:", err)
-			return false, err
-		}
+	info,found,err:=IsPathExist(dirName)
+	if err!=nil{
+		return false,err
+	}
+	if !found{
+		return false,nil
 	}
 	if info.IsDir() {
 		return true, nil
@@ -23,4 +22,17 @@ func IsDirExist(dirName string) (bool, error) {
 		return false, errors.New(msg)
 	}
 
+}
+
+func IsPathExist(path string) (fs.FileInfo,bool,error){
+	info, err := os.Stat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return info,false, nil
+		} else {
+			fmt.Println("there is err:", err)
+			return info,false, err
+		}
+	}
+	return info,true,nil
 }
