@@ -64,6 +64,21 @@ func Hash(filePath string) {
 	file.Close()
 }
 
-func Cat(hash string){
-	
+func Cat(hash string) {
+	path := dir + "/object/" + hash
+
+	exist, err := util.IsFileExist(path)
+	if err != nil {
+		panic(err)
+	}
+	if !exist {
+		panic("file path does not exist")
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		fmt.Println("Error reading file:", err)
+		return
+	}
+	fmt.Printf("File content: %s\n", string(data))
+
 }

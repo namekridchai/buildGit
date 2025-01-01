@@ -36,3 +36,19 @@ func IsPathExist(path string) (fs.FileInfo,bool,error){
 	}
 	return info,true,nil
 }
+
+func IsFileExist(filePath string) (bool, error) {
+	info,found,err:=IsPathExist(filePath)
+	if err!=nil{
+		return false,err
+	}
+	if !found{
+		return false,nil
+	}
+	if !info.IsDir() {
+		return true, nil
+	} else {
+		msg := fmt.Sprintf("path exists but is not a file:%v", filePath)
+		return false, errors.New(msg)
+	}
+}
