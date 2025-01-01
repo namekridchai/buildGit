@@ -37,10 +37,11 @@ func Hash(filePath string) {
 	hash.Write([]byte(content))
 	hashBytes := hash.Sum(nil)
 	hashString := hex.EncodeToString(hashBytes)
-	_, err = os.Stat(dir+"/object")
+	savedDirectory := dir+"/object/"
+	_, err = os.Stat(savedDirectory)
 	if err != nil {
 		if os.IsNotExist(err) {
-			err := os.Mkdir(dir+"/object",0755)
+			err := os.Mkdir(savedDirectory,0755)
 			if err!=nil{
 				panic(err)
 			}
@@ -53,6 +54,12 @@ func Hash(filePath string) {
 	if err != nil {
 		panic(err)
 	}
+	_,err = file.Write(content)
+	if err!=nil{
+		fmt.Println(content)
+		 panic(err)
+	}
+
 	file.Close()
 }
 
