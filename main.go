@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/namekridchai/buildGit/git"
+	command_pkg "github.com/namekridchai/buildGit/command"
 )
 
 func main() {
@@ -20,9 +20,9 @@ func main() {
 
 	switch command {
 	case "init":
-		git.Init()
+		command_pkg.Init()
 	case "hash":
-		git.Hash(os.Args[2])
+		command_pkg.Hash(os.Args[2])
 	default:
 		fmt.Println("Unknown command:", command)
 		os.Exit(1)

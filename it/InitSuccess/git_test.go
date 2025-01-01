@@ -4,12 +4,12 @@ import (
 	"os"
 	"testing"
 
-	"github.com/namekridchai/buildGit/git"
+	"github.com/namekridchai/buildGit/command"
 )
 
 func TestInitSuccess(t *testing.T) {
 	path := ".cgit"
-    git.Init()
+    command.Init()
 	dir, err := os.Stat(path)
 	if err != nil {
         if os.IsNotExist(err) {

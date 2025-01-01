@@ -4,12 +4,12 @@ import (
 	"os"
 	"testing"
 
-	"github.com/namekridchai/buildGit/git"
+	"github.com/namekridchai/buildGit/command"
 )
 
 func TestInitWithDirectoryExist(t *testing.T) {
 	path := ".cgit"
-    git.Init()
+    command.Init()
 	dir, _ := os.Stat(path)
 
     if !dir.IsDir(){

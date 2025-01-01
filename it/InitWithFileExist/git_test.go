@@ -4,16 +4,16 @@ import (
 	"os"
 	"testing"
 
-	"github.com/namekridchai/buildGit/git"
+	"github.com/namekridchai/buildGit/command"
 )
 
 func TestInitWithFileExist(t *testing.T) {
 	path := ".cgit"
-    git.Init()
+	command.Init()
 	dir, _ := os.Stat(path)
 
-    if dir.IsDir(){
-        t.Fatal("should see .cgit  as a file not as a directory")
-    }
- 
+	if dir.IsDir() {
+		t.Fatal("should see .cgit  as a file not as a directory")
+	}
+
 }

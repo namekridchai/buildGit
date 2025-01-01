@@ -1,11 +1,12 @@
-package git
+package command
 
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"os"
+
+	"github.com/namekridchai/buildGit/util"
 )
 
 var (
@@ -14,7 +15,7 @@ var (
 
 func Init() {
 	fmt.Println("init custom git")
-	exist, err := IsDirExist(dir)
+	exist, err := util.IsDirExist(dir)
 	if err != nil {
 		return
 	}
@@ -37,47 +38,28 @@ func Hash(filePath string) {
 	hash.Write([]byte(content))
 	hashBytes := hash.Sum(nil)
 	hashString := hex.EncodeToString(hashBytes)
-	savedDirectory := dir+"/object/"
+	savedDirectory := dir + "/object/"
 	_, err = os.Stat(savedDirectory)
 	if err != nil {
 		if os.IsNotExist(err) {
-			err := os.Mkdir(savedDirectory,0755)
-			if err!=nil{
+			err := os.Mkdir(savedDirectory, 0755)
+			if err != nil {
 				panic(err)
 			}
 		} else {
 			panic(err)
 		}
 	}
-	
-	file, err := os.Create(dir+"/object/"+hashString)
+
+	file, err := os.Create(dir + "/object/" + hashString)
 	if err != nil {
 		panic(err)
 	}
-	_,err = file.Write(content)
-	if err!=nil{
+	_, err = file.Write(content)
+	if err != nil {
 		fmt.Println(content)
-		 panic(err)
+		panic(err)
 	}
 
 	file.Close()
-}
-
-func IsDirExist(dirName string) (bool, error) {
-	info, err := os.Stat(dirName)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return false, nil
-		} else {
-			fmt.Println("there is err:", err)
-			return false, err
-		}
-	}
-	if info.IsDir() {
-		return true, nil
-	} else {
-		msg := fmt.Sprintf("path exists but is not a directory:%v", dirName)
-		return false, errors.New(msg)
-	}
-
 }
