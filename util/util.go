@@ -52,3 +52,19 @@ func IsFileExist(filePath string) (bool, error) {
 		return false, errors.New(msg)
 	}
 }
+
+func CreatDirIfNotExist(dirname string)error{
+	exist, err := IsDirExist(dirname)
+	if err != nil {
+		return err
+	}
+
+	if !exist {
+		err := os.Mkdir(dirname, 0755)
+		if err != nil {
+			fmt.Println("Error creating directory:", err)
+			return err
+		}
+	}
+	return nil
+}

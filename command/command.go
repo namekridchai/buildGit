@@ -5,28 +5,22 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/namekridchai/buildGit/util"
 )
 
 var (
-	dir = ".cgit"
+	dir  = ".cgit"
+	blob = "blob"
 )
 
 func Init() {
 	fmt.Println("init custom git")
-	exist, err := util.IsDirExist(dir)
+	err := util.CreatDirIfNotExist(dir)
 	if err != nil {
 		return
 	}
-
-	if !exist {
-		err := os.Mkdir(dir, 0755)
-		if err != nil {
-			fmt.Println("Error creating directory:", err)
-		}
-	}
-
 }
 
 func Hash(filePath string) {
@@ -34,37 +28,33 @@ func Hash(filePath string) {
 	if err != nil {
 		panic(err)
 	}
+
+	save_content := blob + "\x00" + string(content)
 	hash := sha256.New()
-	hash.Write([]byte(content))
+	hash.Write([]byte(save_content))
 	hashBytes := hash.Sum(nil)
 	hashString := hex.EncodeToString(hashBytes)
+
 	savedDirectory := dir + "/object/"
-	_, err = os.Stat(savedDirectory)
+	err = util.CreatDirIfNotExist(savedDirectory)
 	if err != nil {
-		if os.IsNotExist(err) {
-			err := os.Mkdir(savedDirectory, 0755)
-			if err != nil {
-				panic(err)
-			}
-		} else {
-			panic(err)
-		}
+		return
 	}
 
 	file, err := os.Create(dir + "/object/" + hashString)
 	if err != nil {
 		panic(err)
 	}
-	_, err = file.Write(content)
+	_, err = file.Write([]byte(save_content))
 	if err != nil {
-		fmt.Println(content)
+		fmt.Println(save_content)
 		panic(err)
 	}
 
 	file.Close()
 }
 
-func Cat(hash string) {
+func Cat(hash string, typo string) {
 	path := dir + "/object/" + hash
 
 	exist, err := util.IsFileExist(path)
@@ -75,10 +65,21 @@ func Cat(hash string) {
 		panic("file path does not exist")
 	}
 	data, err := os.ReadFile(path)
+	
+	splitedContent := strings.SplitN(string(data), "\x00", 2)
+	if len(splitedContent) == 1 {
+		panic("get array length of 1 after split content in file")
+	}
+	if splitedContent[0] != typo {
+		errMsg := fmt.Sprintf("cat file get mismatch type expect %v get %v", typo, splitedContent[0])
+		panic(errMsg)
+
+	}
+
 	if err != nil {
 		fmt.Println("Error reading file:", err)
 		return
 	}
-	fmt.Printf("File content: %s\n", string(data))
+	fmt.Printf("File content: %s\n", string(splitedContent[1]))
 
 }
