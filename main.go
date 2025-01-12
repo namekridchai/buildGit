@@ -23,6 +23,8 @@ func main() {
 		command_pkg.Hash(os.Args[2])
 	case "cat":
 		command_pkg.Cat(os.Args[2],"blob")
+	case "write-tree":
+		command_pkg.WriteTree(os.Args[2])
 	default:
 		fmt.Println("Unknown command:", command)
 		os.Exit(1)

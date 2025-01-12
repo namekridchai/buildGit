@@ -65,7 +65,7 @@ func Cat(hash string, typo string) {
 		panic("file path does not exist")
 	}
 	data, err := os.ReadFile(path)
-	
+
 	splitedContent := strings.SplitN(string(data), "\x00", 2)
 	if len(splitedContent) == 1 {
 		panic("get array length of 1 after split content in file")
@@ -81,5 +81,28 @@ func Cat(hash string, typo string) {
 		return
 	}
 	fmt.Printf("File content: %s\n", string(splitedContent[1]))
+
+}
+
+func WriteTree(path string) {
+	found, err := util.IsDirExist(path)
+	if err != nil {
+		panic(err)
+	}
+	if !found {
+		return
+	}
+
+	files, err := os.ReadDir(path)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, file := range files {
+		fmt.Println(file.Name())
+		if file.IsDir() {
+			WriteTree(path + "/" + file.Name())
+		}
+	}
 
 }
