@@ -99,6 +99,9 @@ func WriteTree(path string) {
 	}
 
 	for _, file := range files {
+		if file.Name()==".cgit"{
+			continue
+		}
 		fmt.Println(file.Name())
 		if file.IsDir() {
 			WriteTree(path + "/" + file.Name())
