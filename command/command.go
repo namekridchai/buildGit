@@ -7,12 +7,12 @@ import (
 	"os"
 	"strings"
 
+	"github.com/namekridchai/buildGit/enum"
 	"github.com/namekridchai/buildGit/util"
 )
 
 var (
-	dir  = ".cgit"
-	blob = "blob"
+	dir = ".cgit"
 )
 
 func Init() {
@@ -23,13 +23,13 @@ func Init() {
 	}
 }
 
-func Hash(filePath string) {
+func Hash(filePath string, typo enum.ObjectType) (hashID string) {
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		panic(err)
 	}
 
-	save_content := blob + "\x00" + string(content)
+	save_content := typo.GetObjectType() + "\x00" + string(content)
 	hash := sha256.New()
 	hash.Write([]byte(save_content))
 	hashBytes := hash.Sum(nil)
@@ -52,6 +52,7 @@ func Hash(filePath string) {
 	}
 
 	file.Close()
+	return hashString
 }
 
 func Cat(hash string, typo string) {
@@ -84,8 +85,8 @@ func Cat(hash string, typo string) {
 
 }
 
-func WriteTree(path string) {
-	found, err := util.IsDirExist(path)
+func WriteTree(rootPath string) {
+	found, err := util.IsDirExist(rootPath)
 	if err != nil {
 		panic(err)
 	}
@@ -93,18 +94,21 @@ func WriteTree(path string) {
 		return
 	}
 
-	files, err := os.ReadDir(path)
+	files, err := os.ReadDir(rootPath)
 	if err != nil {
 		panic(err)
 	}
 
 	for _, file := range files {
-		if file.Name()==".cgit"{
+		if file.Name() == ".cgit" || file.Name() == ".git" {
 			continue
 		}
 		fmt.Println(file.Name())
+		path := rootPath + "/" + file.Name()
 		if file.IsDir() {
-			WriteTree(path + "/" + file.Name())
+			WriteTree(path)
+		} else {
+			Hash(path, enum.Blob)
 		}
 	}
 

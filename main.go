@@ -6,6 +6,7 @@ import (
 	"os"
 
 	command_pkg "github.com/namekridchai/buildGit/command"
+	"github.com/namekridchai/buildGit/enum"
 )
 
 func main() {
@@ -20,7 +21,7 @@ func main() {
 	case "init":
 		command_pkg.Init()
 	case "hash":
-		command_pkg.Hash(os.Args[2])
+		command_pkg.Hash(os.Args[2],enum.Blob)
 	case "cat":
 		command_pkg.Cat(os.Args[2],"blob")
 	case "write-tree":
