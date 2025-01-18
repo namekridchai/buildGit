@@ -1,62 +1,44 @@
 package command
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"os"
 	"strings"
 
+	"github.com/namekridchai/buildGit/data"
 	"github.com/namekridchai/buildGit/enum"
 	"github.com/namekridchai/buildGit/util"
 )
 
-var (
-	dir = ".cgit"
-)
+type objectContent struct {
+	objectType enum.ObjectType
+	hashId     string
+	fileName   string
+}
 
 func Init() {
 	fmt.Println("init custom git")
-	err := util.CreatDirIfNotExist(dir)
+	err := util.CreatDirIfNotExist(util.GitRootdir)
 	if err != nil {
 		return
 	}
 }
 
-func Hash(filePath string, typo enum.ObjectType) (hashID string) {
+func Hash(filePath string, typo enum.ObjectType) string {
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		panic(err)
 	}
-
-	save_content := typo.GetObjectType() + "\x00" + string(content)
-	hash := sha256.New()
-	hash.Write([]byte(save_content))
-	hashBytes := hash.Sum(nil)
-	hashString := hex.EncodeToString(hashBytes)
-
-	savedDirectory := dir + "/object/"
-	err = util.CreatDirIfNotExist(savedDirectory)
-	if err != nil {
-		return
-	}
-
-	file, err := os.Create(dir + "/object/" + hashString)
+	hashID, err := data.Hash(content, typo)
 	if err != nil {
 		panic(err)
 	}
-	_, err = file.Write([]byte(save_content))
-	if err != nil {
-		fmt.Println(save_content)
-		panic(err)
-	}
+	return hashID
 
-	file.Close()
-	return hashString
 }
 
 func Cat(hash string, typo string) {
-	path := dir + "/object/" + hash
+	path := util.GitRootdir + "/object/" + hash
 
 	exist, err := util.IsFileExist(path)
 	if err != nil {
@@ -85,13 +67,13 @@ func Cat(hash string, typo string) {
 
 }
 
-func WriteTree(rootPath string) {
+func WriteTree(rootPath string) string {
 	found, err := util.IsDirExist(rootPath)
 	if err != nil {
 		panic(err)
 	}
 	if !found {
-		return
+		return ""
 	}
 
 	files, err := os.ReadDir(rootPath)
@@ -99,17 +81,39 @@ func WriteTree(rootPath string) {
 		panic(err)
 	}
 
+	var objectContents []objectContent
+
 	for _, file := range files {
 		if file.Name() == ".cgit" || file.Name() == ".git" {
 			continue
 		}
 		fmt.Println(file.Name())
 		path := rootPath + "/" + file.Name()
+
+		var hashId string
+		var objectType enum.ObjectType
 		if file.IsDir() {
-			WriteTree(path)
+			objectType = enum.Tree
+			hashId = WriteTree(path)
 		} else {
-			Hash(path, enum.Blob)
+			objectType = enum.Blob
+			hashId = Hash(path, enum.Blob)
 		}
+
+		content := objectContent{objectType: objectType, hashId: hashId, fileName: file.Name()}
+		objectContents = append(objectContents, content)
 	}
+
+	var contentArray string
+	for _, content := range objectContents {
+		c := fmt.Sprintf("%v %v %v\n", content.objectType, content.hashId, content.fileName)
+		contentArray += c
+	}
+
+	hashID, err := data.Hash([]byte(contentArray), enum.Tree)
+	if err != nil {
+		panic(err)
+	}
+	return hashID
 
 }
