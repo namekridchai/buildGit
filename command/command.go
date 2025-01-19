@@ -42,7 +42,12 @@ func Cat(objectId string, typo string) {
 		panic(err)
 	}
 
-	fmt.Printf("File content: %s\n", string(data[1]))
+	if string(data.ObjectType) != typo {
+		errMsg := fmt.Sprintf("cat file get mismatch type expect %v get %v", typo, data.ObjectType)
+		panic(errMsg)
+	}
+
+	fmt.Printf("File content: %s\n", string(data.Content))
 
 }
 

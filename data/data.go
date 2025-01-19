@@ -11,6 +11,11 @@ import (
 	"github.com/namekridchai/buildGit/util"
 )
 
+type objectContent struct {
+	ObjectType enum.ObjectType
+	Content    string
+}
+
 func Hash(content []byte, typo enum.ObjectType) (hashID string, err error) {
 
 	save_content := typo.GetObjectType() + "\x00" + string(content)
@@ -33,25 +38,29 @@ func Hash(content []byte, typo enum.ObjectType) (hashID string, err error) {
 	return hashString, nil
 }
 
-func GetContentfromObjId(objectId string) ([]string, error) {
+func GetContentfromObjId(objectId string) (objectContent, error) {
 	path := util.GitRootdir + "/object/" + objectId
 
 	exist, err := util.IsFileExist(path)
 	if err != nil {
-		panic(err)
+		return objectContent{}, err
 	}
 	if !exist {
-		panic("file path does not exist")
+		return objectContent{}, fmt.Errorf("file not found")
 	}
 	data, err := os.ReadFile(path)
 	if err != nil {
 		fmt.Println("Error reading file:", err)
-		return nil, err
+		return objectContent{}, err
 	}
 
 	splitedContent := strings.SplitN(string(data), "\x00", 2)
 	if len(splitedContent) == 1 {
 		panic("invalid content should get 2 parts after split")
 	}
-	return splitedContent, nil
+	objType, ok := enum.GetObjectType(splitedContent[0])
+	if !ok {
+		return objectContent{}, fmt.Errorf("invalid object type %v", splitedContent[0])
+	}
+	return objectContent{ObjectType: objType, Content: splitedContent[1]}, nil
 }
