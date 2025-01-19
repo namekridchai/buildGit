@@ -3,7 +3,6 @@ package command
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/namekridchai/buildGit/data"
 	"github.com/namekridchai/buildGit/enum"
@@ -12,7 +11,7 @@ import (
 
 type objectContent struct {
 	objectType enum.ObjectType
-	hashId     string
+	objectId   string
 	fileName   string
 }
 
@@ -37,33 +36,13 @@ func Hash(filePath string, typo enum.ObjectType) string {
 
 }
 
-func Cat(hash string, typo string) {
-	path := util.GitRootdir + "/object/" + hash
-
-	exist, err := util.IsFileExist(path)
+func Cat(objectId string, typo string) {
+	data, err := data.GetContentfromObjId(objectId)
 	if err != nil {
 		panic(err)
 	}
-	if !exist {
-		panic("file path does not exist")
-	}
-	data, err := os.ReadFile(path)
 
-	splitedContent := strings.SplitN(string(data), "\x00", 2)
-	if len(splitedContent) == 1 {
-		panic("get array length of 1 after split content in file")
-	}
-	if splitedContent[0] != typo {
-		errMsg := fmt.Sprintf("cat file get mismatch type expect %v get %v", typo, splitedContent[0])
-		panic(errMsg)
-
-	}
-
-	if err != nil {
-		fmt.Println("Error reading file:", err)
-		return
-	}
-	fmt.Printf("File content: %s\n", string(splitedContent[1]))
+	fmt.Printf("File content: %s\n", string(data[1]))
 
 }
 
@@ -100,13 +79,13 @@ func WriteTree(rootPath string) string {
 			hashId = Hash(path, enum.Blob)
 		}
 
-		content := objectContent{objectType: objectType, hashId: hashId, fileName: file.Name()}
+		content := objectContent{objectType: objectType, objectId: hashId, fileName: file.Name()}
 		objectContents = append(objectContents, content)
 	}
 
 	var contentArray string
 	for _, content := range objectContents {
-		c := fmt.Sprintf("%v %v %v\n", content.objectType, content.hashId, content.fileName)
+		c := fmt.Sprintf("%v %v %v\n", content.objectType, content.objectId, content.fileName)
 		contentArray += c
 	}
 
@@ -115,5 +94,18 @@ func WriteTree(rootPath string) string {
 		panic(err)
 	}
 	return hashID
+
+}
+
+func getTree(rootPath string, objectId string) {
+	found, err := util.IsDirExist(rootPath)
+	if err != nil {
+		panic(err)
+	}
+	if !found {
+		return
+	}
+
+	// todo get content from object id
 
 }
