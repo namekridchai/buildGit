@@ -3,13 +3,14 @@ package command
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/namekridchai/buildGit/data"
 	"github.com/namekridchai/buildGit/enum"
 	"github.com/namekridchai/buildGit/util"
 )
 
-type objectContent struct {
+type objectDirContent struct {
 	objectType enum.ObjectType
 	objectId   string
 	fileName   string
@@ -65,7 +66,7 @@ func WriteTree(rootPath string) string {
 		panic(err)
 	}
 
-	var objectContents []objectContent
+	var objectContents []objectDirContent
 
 	for _, file := range files {
 		if file.Name() == ".cgit" || file.Name() == ".git" {
@@ -84,7 +85,7 @@ func WriteTree(rootPath string) string {
 			hashId = Hash(path, enum.Blob)
 		}
 
-		content := objectContent{objectType: objectType, objectId: hashId, fileName: file.Name()}
+		content := objectDirContent{objectType: objectType, objectId: hashId, fileName: file.Name()}
 		objectContents = append(objectContents, content)
 	}
 
@@ -102,7 +103,7 @@ func WriteTree(rootPath string) string {
 
 }
 
-func getTree(rootPath string, objectId string) {
+func GetTree(rootPath string, objectId string) {
 	found, err := util.IsDirExist(rootPath)
 	if err != nil {
 		panic(err)
@@ -111,6 +112,58 @@ func getTree(rootPath string, objectId string) {
 		return
 	}
 
-	// todo get content from object id
+	directoryContent, err := data.GetContentfromObjId(objectId)
+	if err != nil {
+		panic(err)
+	}
 
+	typo, ok := enum.GetObjectType("tree")
+	if !ok {
+		panic("invalid object type")
+	}
+
+	if directoryContent.ObjectType != typo {
+		errMsg := fmt.Sprintf("file  mismatch type expect %v get %v", typo, directoryContent.ObjectType)
+		panic(errMsg)
+	}
+
+	lines := strings.Split(directoryContent.Content, "\n")
+	for _, line := range lines {
+		if line == "" {
+			continue
+		}
+		content := toObjectDirContent(line)
+		if content.objectType == enum.Blob {
+			fileContent, err := data.GetContentfromObjId(content.objectId)
+			if err != nil {
+				panic(err)
+			}
+
+			file, err := os.OpenFile(rootPath+"/"+content.fileName, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+			if err != nil {
+				panic(err)
+			}
+			defer file.Close()
+
+			_, err = file.WriteString(fileContent.Content)
+			if err != nil {
+				panic(err)
+
+			}
+		} else {
+			GetTree(rootPath+"/"+content.fileName, content.objectId)
+		}
+	}
+
+}
+func toObjectDirContent(line string) objectDirContent {
+	splited := strings.Split(line, " ")
+	if len(splited) != 3 {
+		panic("invalid line")
+	}
+	objType, ok := enum.GetObjectType(splited[0])
+	if !ok {
+		panic("invalid object type")
+	}
+	return objectDirContent{objectType: objType, objectId: splited[1], fileName: splited[2]}
 }
