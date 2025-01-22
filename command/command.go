@@ -90,9 +90,12 @@ func WriteTree(rootPath string) string {
 	}
 
 	var contentArray string
-	for _, content := range objectContents {
-		c := fmt.Sprintf("%v %v %v\n", content.objectType, content.objectId, content.fileName)
+	for index, content := range objectContents {
+		c := fmt.Sprintf("%v %v %v", content.objectType, content.objectId, content.fileName)
 		contentArray += c
+		if index != len(objectContents)-1 {
+			contentArray += "\n"
+		}
 	}
 
 	hashID, err := data.Hash([]byte(contentArray), enum.Tree)
@@ -129,9 +132,7 @@ func GetTree(rootPath string, objectId string) {
 
 	lines := strings.Split(directoryContent.Content, "\n")
 	for _, line := range lines {
-		if line == "" {
-			continue
-		}
+
 		content := toObjectDirContent(line)
 		if content.objectType == enum.Blob {
 			fileContent, err := data.GetContentfromObjId(content.objectId)
