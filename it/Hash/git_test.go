@@ -11,6 +11,7 @@ import (
 
 func TestHashShouldGetCorrectFileName(t *testing.T) {
 	GitRootdir := ".cgit"
+	os.Mkdir(GitRootdir, 0755)
 	path := "git_test.go"
 	content, _ := os.ReadFile(path)
 	expect_content := "blob" + "\x00" + string(content)
