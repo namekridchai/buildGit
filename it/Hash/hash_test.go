@@ -9,10 +9,12 @@ import (
 	"github.com/namekridchai/buildGit/command"
 )
 
+const path = "hash_test.go"
+
 func TestHashShouldGetCorrectFileName(t *testing.T) {
 	GitRootdir := ".cgit"
 	os.Mkdir(GitRootdir, 0755)
-	path := "git_test.go"
+
 	expect, _ := os.ReadFile(path)
 	expect_content := "blob" + "\x00" + string(expect)
 
@@ -43,7 +45,6 @@ func TestHashShouldGetCorrectFileName(t *testing.T) {
 func TestHashShouldGetCorrectContent(t *testing.T) {
 	GitRootdir := ".cgit"
 	os.Mkdir(GitRootdir, 0755)
-	path := "git_test.go"
 	expect, _ := os.ReadFile(path)
 	expect_content := "blob" + "\x00" + string(expect)
 
