@@ -37,7 +37,7 @@ func TestHashShouldGetCorrectFileName(t *testing.T) {
 	if dir.IsDir() {
 		t.Fatal("hash does not create file but directory")
 	}
-
+	
 	os.RemoveAll(GitRootdir)
 
 }

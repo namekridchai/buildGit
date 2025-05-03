@@ -57,6 +57,7 @@ func WriteTree(rootPath string) string {
 	if err != nil {
 		panic(err)
 	}
+
 	if !found {
 		return ""
 	}
