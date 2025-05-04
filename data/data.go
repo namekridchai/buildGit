@@ -25,7 +25,7 @@ func Hash(content []byte, typo enum.ObjectType) (hashID string, err error) {
 	hashString := hex.EncodeToString(hashBytes)
 
 	savedDirectory := util.GitRootdir + "/object/"
-	err = util.CreatDirIfNotExist(savedDirectory)
+	err = util.CreateDirIfNotExist(savedDirectory)
 	if err != nil {
 		return "", err
 	}

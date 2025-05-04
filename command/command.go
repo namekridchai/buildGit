@@ -18,7 +18,7 @@ type objectDirContent struct {
 
 func Init() {
 	fmt.Println("init custom git")
-	err := util.CreatDirIfNotExist(util.GitRootdir)
+	err := util.CreateDirIfNotExist(util.GitRootdir)
 	if err != nil {
 		return
 	}
@@ -109,7 +109,7 @@ func WriteTree(rootPath string) string {
 
 func GetTree(rootPath string, objectId string) {
 	found, err := util.IsDirExist(rootPath)
-	
+
 	if err != nil {
 		panic(err)
 	}
@@ -118,7 +118,7 @@ func GetTree(rootPath string, objectId string) {
 	}
 
 	err = clearDirectory(rootPath)
-	if err!=nil{
+	if err != nil {
 		panic(err)
 	}
 
@@ -164,21 +164,37 @@ func GetTree(rootPath string, objectId string) {
 	}
 
 }
+func Commit(msg string,rootPath string) string {
+	found, err := util.IsDirExist(rootPath)
+
+	if err != nil {
+		panic(err)
+	}
+	if !found {
+		return ""
+	}
+	content := fmt.Sprintf("tree %v\n\ncommit %v", WriteTree(rootPath), msg)
+	hashID, err := data.Hash([]byte(content), enum.Commit)
+	if err != nil {
+		panic(err)
+	}
+	return hashID
+}
 
 func clearDirectory(rootPath string) error {
-    files, err := os.ReadDir(rootPath)
-    if err != nil {
-        return err
-    }
+	files, err := os.ReadDir(rootPath)
+	if err != nil {
+		return err
+	}
 
-    for _, file := range files {
-        err := os.RemoveAll(rootPath + "/" + file.Name())
-        if err != nil {
-            return err
-        }
-    }
+	for _, file := range files {
+		err := os.RemoveAll(rootPath + "/" + file.Name())
+		if err != nil {
+			return err
+		}
+	}
 
-    return nil
+	return nil
 }
 
 func toObjectDirContent(line string) objectDirContent {

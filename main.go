@@ -28,6 +28,8 @@ func main() {
 		command_pkg.WriteTree(os.Args[2])
 	case "get-tree":
 		command_pkg.GetTree(os.Args[2], os.Args[3])
+	case "commit":
+		command_pkg.Commit(os.Args[2], os.Args[3])
 	default:
 		fmt.Println("Unknown command:", command)
 		os.Exit(1)

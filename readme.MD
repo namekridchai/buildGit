@@ -10,3 +10,12 @@ blob 4d9323963b3543b48b4c66e75f8561f5a67410c7851aa09ac69330f1b304ac2d main.go
 tree 706c5a410f20511ad603df17a7f9c29d312bdf60dc2fce0ce1479421d3a7dc34 util
 
 get tree will take snap shot from write tree and overwrite file
+run :go run main.go get-tree targetDirectory commit_from_write_tree
+
+commit
+example run : go run main.go commit "this is a test commit" util
+result will look like
+
+commitNuLtree 6f76170e7eb7d1977dfa15234be7fd32ee53d14d20cc6447f16fa14736667412
+
+commit this is a test commit

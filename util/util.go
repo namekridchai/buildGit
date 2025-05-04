@@ -53,7 +53,7 @@ func IsFileExist(filePath string) (bool, error) {
 	}
 }
 
-func CreatDirIfNotExist(dirname string) error {
+func CreateDirIfNotExist(dirname string) error {
 	exist, err := IsDirExist(dirname)
 	if err != nil {
 		return err
