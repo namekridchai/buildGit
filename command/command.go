@@ -109,11 +109,17 @@ func WriteTree(rootPath string) string {
 
 func GetTree(rootPath string, objectId string) {
 	found, err := util.IsDirExist(rootPath)
+	
 	if err != nil {
 		panic(err)
 	}
 	if !found {
 		return
+	}
+
+	err = clearDirectory(rootPath)
+	if err!=nil{
+		panic(err)
 	}
 
 	directoryContent, err := data.GetContentfromObjId(objectId)
@@ -158,6 +164,23 @@ func GetTree(rootPath string, objectId string) {
 	}
 
 }
+
+func clearDirectory(rootPath string) error {
+    files, err := os.ReadDir(rootPath)
+    if err != nil {
+        return err
+    }
+
+    for _, file := range files {
+        err := os.RemoveAll(rootPath + "/" + file.Name())
+        if err != nil {
+            return err
+        }
+    }
+
+    return nil
+}
+
 func toObjectDirContent(line string) objectDirContent {
 	splited := strings.Split(line, " ")
 	if len(splited) != 3 {

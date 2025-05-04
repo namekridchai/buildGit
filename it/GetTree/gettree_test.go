@@ -10,7 +10,7 @@ import (
 	"github.com/namekridchai/buildGit/command"
 )
 
-func TestWritetreeShouldGetCorrectContentonDirectory(t *testing.T) {
+func TestGetTreeShouldOverWriteContenFromSpecificObjectIDDirectoryCorrectly(t *testing.T) {
 	GitRootdir := ".cgit"
 	os.Mkdir(GitRootdir, 0755)
 
@@ -28,7 +28,7 @@ func TestWritetreeShouldGetCorrectContentonDirectory(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
+	file.Close()
 
 	command.GetTree(parentDir, dirObjectID)
 	fileObjectIDActual := getHashStringFromFile(parentDir + "/" + childFile)
