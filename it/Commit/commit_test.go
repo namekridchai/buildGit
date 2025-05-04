@@ -15,6 +15,7 @@ func TestCommitShouldSaveContentIntoObjectDatabaseCorrectly(t *testing.T) {
 	parentDir := "test"
 	commitMsg := "test commit"
 	objectType := "tree"
+	os.Mkdir(parentDir, 0755)
 
 	objectID := command.Commit(commitMsg, parentDir)
 	hashedFilePath := GitRootdir + "/object/" + objectID
@@ -35,5 +36,6 @@ func TestCommitShouldSaveContentIntoObjectDatabaseCorrectly(t *testing.T) {
 	}
 
 	os.RemoveAll(GitRootdir)
+	os.RemoveAll(parentDir)
 
 }
