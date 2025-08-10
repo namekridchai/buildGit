@@ -178,6 +178,7 @@ func Commit(msg string,rootPath string) string {
 	if err != nil {
 		panic(err)
 	}
+	util.CreateAndWriteFile(util.GitRootdir+"/HEAD", hashID)
 	return hashID
 }
 

@@ -35,6 +35,12 @@ func TestCommitShouldSaveContentIntoObjectDatabaseCorrectly(t *testing.T) {
 		t.Fatalf("expect %v but got %v", commitMsg, string(actual))
 	}
 
+	headFilePath := GitRootdir + "/HEAD"
+	headContent, _ := os.ReadFile(headFilePath)
+	if string(headContent) != objectID {
+		t.Fatalf("expect HEAD to point to %v but got %v", objectID, string(headContent))
+	}
+
 	os.RemoveAll(GitRootdir)
 	os.RemoveAll(parentDir)
 
