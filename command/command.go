@@ -24,6 +24,39 @@ func Init() {
 	}
 }
 
+func LogCommit() {
+	headFilePath := util.GitRootdir + "/HEAD"
+	exist, err := util.IsFileExist(headFilePath)
+	if err != nil {
+		panic(err)
+	}
+	if !exist {
+		fmt.Println("No commits found.")
+		return
+	}
+
+	headContent, _ := os.ReadFile(headFilePath)
+	objectId := string(headContent)
+
+	for objectId != "" {
+		content, err := data.GetContentfromObjId(objectId)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("Commit ID: %s\n", objectId)
+
+		lines := strings.Split(content.Content, "\n")
+		fmt.Printf("Message: %s\n", lines[len(lines)-1])
+
+		if strings.HasPrefix(lines[1], "parent ") {
+			objectId = strings.TrimPrefix(lines[1], "parent ")
+
+		} else {
+			objectId = ""
+		}
+	}
+}
+
 func Hash(filePath string, typo enum.ObjectType) string {
 	content, err := os.ReadFile(filePath)
 	if err != nil {
