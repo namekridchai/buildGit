@@ -88,6 +88,59 @@ All objects are stored in `.cgit/object/` as files named by their SHA-256 hash.
 - **tree**: Stores directory structure (list of blobs and subtrees).
 - **commit**: Stores reference to a tree and a commit message.
 
+## Object Structure
+
+Your custom Git implementation uses three main object types, each stored as a file named by its SHA-256 hash in `.cgit/object/`:
+
+### 1. **Blob**
+- **Purpose:** Stores the raw content of a file.
+- **Format:**
+  ```
+  blob\x00<file content>
+  ```
+- **Example:**
+  ```
+  blob\x00Hello, world!
+  ```
+
+### 2. **Tree**
+- **Purpose:** Represents a directory and its contents (files and subdirectories).
+- **Format:**
+  Each line describes one entry:
+  ```
+   tree\x00<objectType> <objectId> <fileName>
+  ```
+  - `objectType`: `blob` for files, `tree` for subdirectories
+  - `objectId`: SHA-256 hash of the referenced object (blob or tree)
+  - `fileName`: Name of the file or directory in the parent directory
+
+- **Example:**
+  ```
+  tree\x00blob 123abc... test.txt
+  tree 456def... subdir
+  ```
+
+### 3. **Commit**
+- **Purpose:** Records a snapshot of the project, referencing a tree and including a commit message.
+- **Format:**
+  ```
+  commit\x00tree <treeObjectId>
+
+  commit <commit message>
+  ```
+- **Example:**
+  ```
+  commit\x00tree 456def...
+
+  commit Initial commit
+  ```
+
+---
+
+All objects are stored in `.cgit/object/` as files named by their hash. The first part of each object file indicates its type (`blob`, `tree`, or `commit`). Trees reference blobs (files) and other trees (subdirectories). Commits reference a tree and store a message.
+
+---
+
 ## Project Structure
 
 - [`main.go`](main.go): CLI entry point.
@@ -111,7 +164,3 @@ go run main.go hash somefile.txt
 go run main.go write-tree mydir
 go run main.go commit "Initial commit" mydir
 ```
-
-## License
-
-MIT (or specify your license)
