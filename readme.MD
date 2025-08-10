@@ -1,21 +1,117 @@
-write tree will get a file on below line
+# buildGit
 
-treeNuLtree 9888eef03063a06756e667cd32c35df2a1cc8453b53828280be7546e326078f9 .github
-tree 89c784f0dba018eaf1d68c928a9ad968a6f74218efc0ba18dc848090401e17ec command
-tree 500a9307c0d7b417859c6cf8f1a29349fc5c293cb98865f52a4cad01f9ce6574 data
-tree 4baebc60aba1ff993e7afdebac48f9375a3323d43e0e8ab82f72e686ebca57f9 enum
-blob 702e99e56dbf1bfa17e87362a1d5764b00eb9905e74787d91c1e2973028d5ffc go.mod
-tree dd90b4e9251cde5ba43b1c16874173011a39d25fb016763f72fcd5c57a91a5cb it
-blob 4d9323963b3543b48b4c66e75f8561f5a67410c7851aa09ac69330f1b304ac2d main.go
-tree 706c5a410f20511ad603df17a7f9c29d312bdf60dc2fce0ce1479421d3a7dc34 util
+A minimal custom Git-like version control system implemented in Go.  
+This project demonstrates basic concepts of content-addressable storage, trees, and commits, similar to how Git works internally.
 
-get tree will take snap shot from write tree and overwrite file
-run :go run main.go get-tree targetDirectory commit_from_write_tree
+## Features
 
-commit
-example run : go run main.go commit "this is a test commit" util
-result will look like
+- **init**: Initialize a `.cgit` object database in the current directory.
+- **hash**: Hash a file and store its content as a blob object.
+- **cat**: Print the content of a stored object by its object ID.
+- **write-tree**: Store the directory structure as a tree object.
+- **get-tree**: Restore a directory structure from a tree object.
+- **commit**: Create a commit object referencing a tree and a commit message.
 
-commitNuLtree 6f76170e7eb7d1977dfa15234be7fd32ee53d14d20cc6447f16fa14736667412
+## Getting Started
 
-commit this is a test commit
+### Prerequisites
+
+- Go 1.22 or newer
+
+### Installation
+
+Clone this repository and build the project:
+
+```sh
+git clone <your-repo-url>
+cd buildGit
+go build
+```
+
+### Usage
+
+Run commands using `go run main.go [command] [args...]`:
+
+#### Initialize repository
+
+```sh
+go run main.go init
+```
+
+Creates a `.cgit` directory for storing objects.
+
+#### Hash a file
+
+```sh
+go run main.go hash <file-path>
+```
+
+Hashes the file and stores it as a blob object.
+
+#### Show object content
+
+```sh
+go run main.go cat <object-id> blob
+```
+
+Prints the content of the blob object.
+
+#### Write a tree object
+
+```sh
+go run main.go write-tree <directory-path>
+```
+
+Stores the directory structure as a tree object and prints its object ID.
+
+#### Restore a tree
+
+```sh
+go run main.go get-tree <target-directory> <tree-object-id>
+```
+
+Restores the directory structure from the specified tree object.
+
+#### Commit
+
+```sh
+go run main.go commit "<commit-message>" <directory-path>
+```
+
+Creates a commit object referencing the tree of the given directory.
+
+## Object Storage
+
+All objects are stored in `.cgit/object/` as files named by their SHA-256 hash.
+
+- **blob**: Stores file content.
+- **tree**: Stores directory structure (list of blobs and subtrees).
+- **commit**: Stores reference to a tree and a commit message.
+
+## Project Structure
+
+- [`main.go`](main.go): CLI entry point.
+- [`command/command.go`](command/command.go): Implements commands.
+- [`data/data.go`](data/data.go): Handles object storage and retrieval.
+- [`enum/objectType.go`](enum/objectType.go): Defines object types.
+- [`util/util.go`](util/util.go), [`util/constant.go`](util/constant.go): Utility functions and constants.
+- [`it/`](it/): Integration tests for commands.
+
+## Running Tests
+
+```sh
+go test ./...
+```
+
+## Example
+
+```sh
+go run main.go init
+go run main.go hash somefile.txt
+go run main.go write-tree mydir
+go run main.go commit "Initial commit" mydir
+```
+
+## License
+
+MIT (or specify your license)
