@@ -17,8 +17,8 @@ func TestCommitShouldSaveContentIntoObjectDatabaseCorrectly(t *testing.T) {
 	objectType := "tree"
 	os.Mkdir(parentDir, 0755)
 
-	objectID := command.Commit(commitMsg, parentDir)
-	hashedFilePath := GitRootdir + "/object/" + objectID
+	objectIDParent := command.Commit(commitMsg, parentDir)
+	hashedFilePath := GitRootdir + "/object/" + objectIDParent
 	_, err := os.Stat(hashedFilePath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -37,8 +37,15 @@ func TestCommitShouldSaveContentIntoObjectDatabaseCorrectly(t *testing.T) {
 
 	headFilePath := GitRootdir + "/HEAD"
 	headContent, _ := os.ReadFile(headFilePath)
-	if string(headContent) != objectID {
-		t.Fatalf("expect HEAD to point to %v but got %v", objectID, string(headContent))
+	if string(headContent) != objectIDParent {
+		t.Fatalf("expect HEAD to point to %v but got %v", objectIDParent, string(headContent))
+	}
+
+	objectIDChild := command.Commit(commitMsg, parentDir)
+	hashedFilePathChild := GitRootdir + "/object/" + objectIDChild
+	actualChild, _ := os.ReadFile(hashedFilePathChild)
+	if !strings.Contains(string(actualChild), objectIDParent) {
+		t.Fatalf("expect %v but got %v", objectIDParent, string(actualChild))
 	}
 
 	os.RemoveAll(GitRootdir)

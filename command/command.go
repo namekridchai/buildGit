@@ -164,7 +164,7 @@ func GetTree(rootPath string, objectId string) {
 	}
 
 }
-func Commit(msg string,rootPath string) string {
+func Commit(msg string, rootPath string) string {
 	found, err := util.IsDirExist(rootPath)
 
 	if err != nil {
@@ -173,12 +173,37 @@ func Commit(msg string,rootPath string) string {
 	if !found {
 		return ""
 	}
-	content := fmt.Sprintf("tree %v\n\ncommit %v", WriteTree(rootPath), msg)
-	hashID, err := data.Hash([]byte(content), enum.Commit)
+
+	headFilePath := util.GitRootdir + "/HEAD"
+
+	exist, err := util.IsFileExist(headFilePath)
 	if err != nil {
 		panic(err)
 	}
-	util.CreateAndWriteFile(util.GitRootdir+"/HEAD", hashID)
+	if !exist {
+		content := fmt.Sprintf("tree %v\n\ncommit %v", WriteTree(rootPath), msg)
+		hashID, err := data.Hash([]byte(content), enum.Commit)
+
+		if err != nil {
+			panic(err)
+		}
+		util.CreateAndWriteFile(headFilePath, hashID)
+		return hashID
+	}
+
+	headObjectID, err := os.ReadFile(headFilePath)
+	if err != nil {
+		fmt.Println("Error reading file:", err)
+		panic(err)
+	}
+
+	content := fmt.Sprintf("tree %v\nparent %v\ncommit %v", WriteTree(rootPath), string(headObjectID), msg)
+	hashID, err := data.Hash([]byte(content), enum.Commit)
+
+	if err != nil {
+		panic(err)
+	}
+
 	return hashID
 }
 
