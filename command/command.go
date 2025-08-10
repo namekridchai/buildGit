@@ -180,29 +180,26 @@ func Commit(msg string, rootPath string) string {
 	if err != nil {
 		panic(err)
 	}
-	if !exist {
-		content := fmt.Sprintf("tree %v\n\ncommit %v", WriteTree(rootPath), msg)
-		hashID, err := data.Hash([]byte(content), enum.Commit)
+	var hashID string
+	var content string
 
+	if !exist {
+		content = fmt.Sprintf("tree %v\n\ncommit %v", WriteTree(rootPath), msg)
+	} else {
+		headObjectID, err := os.ReadFile(headFilePath)
 		if err != nil {
+			fmt.Println("Error reading file:", err)
 			panic(err)
 		}
-		util.CreateAndWriteFile(headFilePath, hashID)
-		return hashID
+
+		content = fmt.Sprintf("tree %v\nparent %v\ncommit %v", WriteTree(rootPath), string(headObjectID), msg)
+
 	}
-
-	headObjectID, err := os.ReadFile(headFilePath)
-	if err != nil {
-		fmt.Println("Error reading file:", err)
-		panic(err)
-	}
-
-	content := fmt.Sprintf("tree %v\nparent %v\ncommit %v", WriteTree(rootPath), string(headObjectID), msg)
-	hashID, err := data.Hash([]byte(content), enum.Commit)
-
+	hashID, err = data.Hash([]byte(content), enum.Commit)
 	if err != nil {
 		panic(err)
 	}
+	util.CreateAndWriteFile(headFilePath, hashID)
 
 	return hashID
 }
